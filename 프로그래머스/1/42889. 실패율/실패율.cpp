@@ -1,10 +1,11 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include <algorithm>
 
 bool Compare(const std::pair<float, int>& _LeftPair, const std::pair<float, int>& _RightPair)
 {
-    if (_LeftPair.first == _RightPair.first)
+    if (fabs(_LeftPair.first - _RightPair.first) < 0.00000000001f)
     {
         return _LeftPair.second < _RightPair.second;
     }
