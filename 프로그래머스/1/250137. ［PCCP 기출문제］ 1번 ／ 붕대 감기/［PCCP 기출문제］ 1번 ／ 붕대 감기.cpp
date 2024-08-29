@@ -12,12 +12,14 @@ public:
 
     void TakeDamage(int _DamageValue)
     {
+        // 데미지 후 지금까지 힐한 횟수 초기화
         Hp -= _DamageValue;
         SuccessContinueHealCount = 0;
     }
 
     void Heal(int _HealValue)
     {
+        // Hp가 0이면 무시
         if (Hp <= 0)
         {
             return;
@@ -25,10 +27,12 @@ public:
 
         ++SuccessContinueHealCount;
 
+        // 일반 힐
         if (SuccessContinueHealCount != ConditionHealCount)
         {
             Hp += _HealValue;
         }
+        // 추가 힐
         else
         {
             Hp += _HealValue;
@@ -36,6 +40,7 @@ public:
             SuccessContinueHealCount = 0;
         }
 
+        // Max 값 초과 시
         if (Hp > MaxHp)
         {
             Hp = MaxHp;
