@@ -1,42 +1,26 @@
 #include <string>
 #include <vector>
+#include <bitset>
+#include <regex>
 
 std::string DecimalToBinary(int _Value, int _Size)
 {
-    std::string ReturnValue;
-    ReturnValue.reserve(_Size);
+    std::string BinaryValue = std::bitset<16>(_Value).to_string();
 
-    int ChangeValue = _Value;
-    std::string ChangeValueString;
-    while (ChangeValue > 0)
+    const int SliceIndex = 16 - _Size;
+
+    std::string ReturnValue = BinaryValue.substr(SliceIndex, _Size);
+
+    for (int i = 0; i < _Size; ++i)
     {
-        int RemainValue = ChangeValue % 2;
-        if (0 == RemainValue)
+        if ('0' == ReturnValue[i])
         {
-            ChangeValueString.push_back(' ');
+            ReturnValue[i] = ' ';
         }
         else
         {
-            ChangeValueString.push_back('#');
+            ReturnValue[i] = '#';
         }
-        
-        ChangeValue /= 2;
-    }
-
-    const int ChangeValueSize = static_cast<int>(ChangeValueString.size());
-
-    if (ChangeValueSize < _Size)
-    {
-        int PushCount = _Size - ChangeValueSize;
-        for (int i = 0; i < PushCount; ++i)
-        {
-            ReturnValue.push_back(' ');
-        }
-    }
-
-    for (int i = (ChangeValueSize - 1); i >= 0; --i)
-    {
-        ReturnValue.push_back(ChangeValueString[i]);
     }
 
     return ReturnValue;
@@ -44,48 +28,24 @@ std::string DecimalToBinary(int _Value, int _Size)
 
 std::vector<std::string> solution(int n, std::vector<int> arr1, std::vector<int> arr2)
 {
-    const int Arr1Size = arr1.size();
-
     std::vector<std::string> answer;
-    answer.reserve(Arr1Size);
+    answer.reserve(arr1.size());
 
-    std::vector<std::string> AnalysisArr1;
-    AnalysisArr1.reserve(Arr1Size);
-
-    for (int Num : arr1)
+    for (int i = 0; i < n; ++i)
     {
-        AnalysisArr1.push_back(DecimalToBinary(Num, n));
+        arr1[i] = arr1[i] | arr2[i];
     }
 
-    std::vector<std::string> AnalysisArr2;
-    AnalysisArr2.reserve(Arr1Size);
+    std::vector<std::string> ChangeBinary;
 
-    for (int Num : arr2)
+    for (int i = 0; i < n; ++i)
     {
-        AnalysisArr2.push_back(DecimalToBinary(Num, n));
-    }
+        std::string BinaryNum = DecimalToBinary(arr1[i], n);
+        
+        BinaryNum = std::regex_replace(BinaryNum, std::regex("1"), "#");
+        BinaryNum = std::regex_replace(BinaryNum, std::regex("0"), " ");
 
-    for (int i = 0; i < Arr1Size; ++i)
-    {
-        std::string PushString;
-        PushString.reserve(n);
-
-        for (int j = 0; j < n; ++j)
-        {
-            char Arr1Value = AnalysisArr1[i][j];
-            char Arr2Value = AnalysisArr2[i][j];
-
-            if (' ' == Arr1Value && ' ' == Arr2Value)
-            {
-                PushString.push_back(' ');
-            }
-            else
-            {
-                PushString.push_back('#');
-            }
-        }
-
-        answer.push_back(PushString);
+        answer.push_back(BinaryNum);
     }
 
     return answer;
