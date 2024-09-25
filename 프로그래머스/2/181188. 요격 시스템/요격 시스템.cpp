@@ -41,27 +41,32 @@ bool Compare(const std::vector<int>& _Left, const std::vector<int>& _Right)
 
 int solution(std::vector<std::vector<int>> targets)
 {
-    int answer = 1;
-
     sort(targets.begin(), targets.end(), Compare);
     int MissileCount = static_cast<int>(targets.size());
 
-    Width CheckMissile = Width(targets[0][0], targets[0][1]);
+    std::vector<Width> InterceptCount;
 
-    for (int i = 1; i < MissileCount; ++i)
+    for (int i = 0; i < MissileCount; ++i)
     {
         Width CurMissile = Width(targets[i][0], targets[i][1]);
+        bool IsIntercept = false;
 
-        if (true == IsOverlap(CheckMissile, CurMissile))
+        const int InterceptSize = static_cast<int>(InterceptCount.size());
+
+        for (int i = 0; i < InterceptSize; ++i)
         {
-            CheckMissile = CheckMissile.Left > CurMissile.Left ? CheckMissile : CurMissile;
+            if (true == IsOverlap(InterceptCount[i], CurMissile))
+            {
+                InterceptCount[i] = InterceptCount[i].Left > CurMissile.Left ? InterceptCount[i] : CurMissile;
+                IsIntercept = true;
+            }
         }
-        else
+
+        if (false == IsIntercept)
         {
-            CheckMissile = CurMissile;
-            ++answer;
+            InterceptCount.push_back(CurMissile);
         }
     }
 
-    return answer;
+    return InterceptCount.size();
 }
