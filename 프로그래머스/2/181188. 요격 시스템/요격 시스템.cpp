@@ -29,19 +29,9 @@ bool IsOverlap(const Width& _X, const Width& _Y)
     return true;
 }
 
-bool Compare(const std::vector<int>& _Left, const std::vector<int>& _Right)
-{
-    if (_Left[0] == _Right[0])
-    {
-        return _Left[1] > _Right[1];
-    }
-
-    return _Left[0] > _Right[0];
-}
-
 int solution(std::vector<std::vector<int>> targets)
 {
-    sort(targets.begin(), targets.end(), Compare);
+    sort(targets.begin(), targets.end());
     int MissileCount = static_cast<int>(targets.size());
 
     std::vector<Width> InterceptCount;
@@ -57,7 +47,7 @@ int solution(std::vector<std::vector<int>> targets)
         {
             if (true == IsOverlap(InterceptCount[i], CurMissile))
             {
-                InterceptCount[i] = InterceptCount[i].Left > CurMissile.Left ? InterceptCount[i] : CurMissile;
+                InterceptCount[i] = InterceptCount[i].Right < CurMissile.Right ? InterceptCount[i] : CurMissile;
                 IsIntercept = true;
             }
         }
