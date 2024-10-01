@@ -24,8 +24,7 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
     std::vector<std::string> answer;
     answer.reserve(orders.size());
 
-    std::set<char> OverlapMenu;
-    std::set<std::string> OverlapMenuString;
+    std::set<std::string> OverlapMenu;
 
     const size_t OrderCount = orders.size();
 
@@ -41,8 +40,8 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
             {
                 if (std::string::npos != StandardOrder.find(Menu))
                 {
-                    OverlapMenu.insert(Menu);
-                    OverlapMenuString.insert(std::string(1, Menu));
+                    std::string PlusMenu(1, Menu);
+                    OverlapMenu.insert(PlusMenu);
                 }
             }
         }
@@ -51,29 +50,34 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
     int MaxCourseCount = course[course.size() - 1];
     std::vector<std::set<std::string>> AllCourse;
     AllCourse.resize(MaxCourseCount);
-    AllCourse[0] = OverlapMenuString;
+    AllCourse[0] = OverlapMenu;
 
-    for (int i = 1; i < MaxCourseCount; ++i)
+    for (const std::string& Order : orders)
     {
-        std::set<std::string> MakeCourse = AllCourse[i];
-        const std::set<std::string>& PrevSet = AllCourse[i - 1];
-
-        for (const std::string& CurCourse : PrevSet)
+        for (int i = 1; i < MaxCourseCount; ++i)
         {
-            char LastChar = CurCourse[CurCourse.size() - 1];
+            std::set<std::string> MakeCourse = AllCourse[i];
+            const std::set<std::string>& PrevSet = AllCourse[i - 1];
 
-            for (char Menu : OverlapMenu)
+            const size_t OrderSize = Order.size();
+
+            for (const std::string& CurCourse : PrevSet)
             {
-                if (Menu > LastChar)
+                char LastChar = CurCourse[CurCourse.size() - 1];
+
+                for (char Menu : Order)
                 {
-                    std::string PlusCourse = CurCourse;
-                    PlusCourse.push_back(Menu);
-                    MakeCourse.insert(PlusCourse);
+                    if (Menu > LastChar)
+                    {
+                        std::string PlusCourse = CurCourse;
+                        PlusCourse.push_back(Menu);
+                        MakeCourse.insert(PlusCourse);
+                    }
                 }
             }
-        }
 
-        AllCourse[i] = MakeCourse;
+            AllCourse[i] = MakeCourse;
+        }
     }
 
     // 만들어진 조합 중 2개 이상 포함되는 주문 내용은 Course에 추가
@@ -85,8 +89,6 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
 
         std::set<std::string>::iterator BeginIter = CountAllCourse.begin();
         std::set<std::string>::iterator EndIter = CountAllCourse.end();
-
-        int MaxCount = -1;
 
         for (; BeginIter != EndIter; ++BeginIter)
         {
@@ -101,7 +103,6 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
                     if (std::string::npos == Order.find(Menu))
                     {
                         IsOrder = false;
-                        break;
                     }
                 }
 
@@ -113,11 +114,7 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
 
             if (Count > 1)
             {
-                if (Count >= MaxCount)
-                {
-                    Course.insert(std::make_pair(*BeginIter, Count));
-                    MaxCount = Count;
-                }                
+                Course.insert(std::make_pair(*BeginIter, Count));
             }
         }
     }
