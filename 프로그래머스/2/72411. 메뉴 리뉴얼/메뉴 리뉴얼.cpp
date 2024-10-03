@@ -1,8 +1,55 @@
 #include <string>
 #include <vector>
-#include <map>
 #include <set>
+#include <map>
 #include <algorithm>
+
+class Course
+{
+public:
+    Course(const std::string& _Value)
+        : Order(_Value)
+    {
+
+    }
+
+    std::set<std::string> MakeCourse(int _Count)
+    {
+        std::set<std::string> ReturnSet;
+
+        if (_Count == 1)
+        {
+            for (char Menu : Order)
+            {
+                ReturnSet.insert(std::string(1, Menu));
+            }
+
+            return ReturnSet;
+        }
+
+        std::set<std::string> PrevSet = MakeCourse(_Count - 1);
+
+        for (const std::string& Course : PrevSet)
+        {
+            char LastMenu = Course[Course.size() - 1];
+
+            for (char Menu : Order)
+            {
+                std::string PlusCourse = Course;
+                if (LastMenu < Menu)
+                {
+                    PlusCourse += Menu;
+                    ReturnSet.insert(PlusCourse);
+                }
+            }
+        }
+
+        return ReturnSet;
+    }
+
+private:
+    std::string Order = "";
+};
 
 struct OrderStandard
 {
@@ -24,113 +71,59 @@ std::vector<std::string> solution(std::vector<std::string> orders, std::vector<i
     std::vector<std::string> answer;
     answer.reserve(orders.size());
 
-    std::set<char> OverlapMenu;
-    std::set<std::string> OverlapMenuString;
+    // 만든 조합과 조합을 가지고 있는 개수
+    std::map<std::string, int, OrderStandard> CourseCount;
 
-    const size_t OrderCount = orders.size();
-
-    for (size_t i = 0; i < OrderCount - 1; ++i)
+    for (std::string& Order : orders)
     {
-        std::string StandardOrder = orders[i];
+        sort(Order.begin(), Order.end());
+    }
 
-        for (size_t j = i + 1; j < OrderCount; ++j)
+    for (int Count : course)
+    {
+        // 현재 오더로 조합 만들기
+        for (const std::string& Order : orders)
         {
-            std::string CheckOrder = orders[j];
+            Course CurOrderCourse = Course(Order);
+            std::set<std::string> CurOrderSet = CurOrderCourse.MakeCourse(Count);
 
-            for (char Menu : CheckOrder)
+            for (const std::string& MakeCourse : CurOrderSet)
             {
-                if (std::string::npos != StandardOrder.find(Menu))
+                if (CourseCount.end() != CourseCount.find(MakeCourse))
                 {
-                    OverlapMenu.insert(Menu);
-                    OverlapMenuString.insert(std::string(1, Menu));
+                    CourseCount[MakeCourse] += 1;
+                }
+                else
+                {
+                    CourseCount.insert(std::make_pair(MakeCourse, 1));
                 }
             }
         }
     }
 
-    int MaxCourseCount = course[course.size() - 1];
-    std::vector<std::set<std::string>> AllCourse;
-    AllCourse.resize(MaxCourseCount);
-    AllCourse[0] = OverlapMenuString;
+    std::map<std::string, int>::iterator BeginIter = CourseCount.begin();
+    std::map<std::string, int>::iterator EndIter = CourseCount.end();
 
-    for (int i = 1; i < MaxCourseCount; ++i)
+    for (; BeginIter != EndIter;)
     {
-        std::set<std::string> MakeCourse = AllCourse[i];
-        const std::set<std::string>& PrevSet = AllCourse[i - 1];
-
-        for (const std::string& CurCourse : PrevSet)
+        if (BeginIter->second == 1)
         {
-            char LastChar = CurCourse[CurCourse.size() - 1];
-
-            for (char Menu : OverlapMenu)
-            {
-                if (Menu > LastChar)
-                {
-                    std::string PlusCourse = CurCourse;
-                    PlusCourse.push_back(Menu);
-                    MakeCourse.insert(PlusCourse);
-                }
-            }
+            BeginIter = CourseCount.erase(BeginIter);
         }
-
-        AllCourse[i] = MakeCourse;
-    }
-
-    // 만들어진 조합 중 2개 이상 포함되는 주문 내용은 Course에 추가
-    std::map<std::string, int, OrderStandard> Course;
-
-    for (int CourseCount : course)
-    {
-        std::set<std::string> CountAllCourse = AllCourse[CourseCount - 1];
-
-        std::set<std::string>::iterator BeginIter = CountAllCourse.begin();
-        std::set<std::string>::iterator EndIter = CountAllCourse.end();
-
-        int MaxCount = -1;
-
-        for (; BeginIter != EndIter; ++BeginIter)
+        else
         {
-            int Count = 0;
-
-            for (const std::string& Order : orders)
-            {
-                bool IsOrder = true;
-
-                for (char Menu : *BeginIter)
-                {
-                    if (std::string::npos == Order.find(Menu))
-                    {
-                        IsOrder = false;
-                        break;
-                    }
-                }
-
-                if (true == IsOrder)
-                {
-                    ++Count;
-                }
-            }
-
-            if (Count > 1)
-            {
-                if (Count >= MaxCount)
-                {
-                    Course.insert(std::make_pair(*BeginIter, Count));
-                    MaxCount = Count;
-                }                
-            }
+            ++BeginIter;
         }
     }
 
-    // 해당 조합 중 가장 많은 Course 요리 추가
     for (int CourseMenuCount : course)
     {
-        std::map<std::string, int>::iterator BeginIter = Course.begin();
-        std::map<std::string, int>::iterator EndIter = Course.end();
+        std::map<std::string, int>::iterator BeginIter = CourseCount.begin();
+        std::map<std::string, int>::iterator EndIter = CourseCount.end();
 
         int MaxCount = -1;
         std::vector<std::string> PlusFactor;
-        PlusFactor.reserve(Course.size());
+        PlusFactor.reserve(CourseCount.size());
 
         for (; BeginIter != EndIter; ++BeginIter)
         {
