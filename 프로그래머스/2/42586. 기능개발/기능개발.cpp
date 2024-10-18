@@ -1,6 +1,5 @@
 #include <cmath>
 #include <vector>
-#include <queue>
 
 std::vector<int> solution(std::vector<int> progresses, std::vector<int> speeds)
 {
@@ -9,40 +8,21 @@ std::vector<int> solution(std::vector<int> progresses, std::vector<int> speeds)
 
     const size_t ProgressCount = progresses.size();
 
-    std::queue<int> DistributionDay;
+    answer.push_back(1);
+    int Max_Day = std::ceil((100 - progresses[0]) / static_cast<float>(speeds[0]));
 
-    for (size_t i = 0; i < ProgressCount; ++i)
+    for (size_t i = 1; i < ProgressCount; ++i)
     {
-        DistributionDay.push(std::ceil((100 - progresses[i]) / static_cast<float>(speeds[i])));
-    }
+        int Cur_Day = std::ceil((100 - progresses[i]) / static_cast<float>(speeds[i]));
 
-    int Count = 1;
-    int Condition = DistributionDay.front();
-    DistributionDay.pop();
-
-    while(1)
-    {
-        if(DistributionDay.empty() == true)
+        if (Cur_Day <= Max_Day)
         {
-            if (Count != 0)
-            {
-                answer.push_back(Count);
-            }
-            break;
-        }
-
-        int CurValue = DistributionDay.front();
-        DistributionDay.pop();
-
-        if (CurValue <= Condition)
-        {
-            ++Count;
+            ++answer.back();
         }
         else
         {
-            answer.push_back(Count);
-            Count = 1;
-            Condition = CurValue;
+            Max_Day = Cur_Day;
+            answer.push_back(1);
         }
     }
 
