@@ -5,32 +5,29 @@ long long solution(std::vector<int> weights)
 {
     long long answer = 0;
 
-    std::vector<long long> arr(2001, 0);
+    sort(weights.begin(), weights.end());
 
-    for (const auto v : weights)
+    const size_t People = weights.size();
+
+    for (size_t i = 0; i < People; ++i)
     {
-        arr[v]++;
-    }
-
-    for (int i = 100; i <= 1000; ++i)
-    {
-        if (arr[i] == 0)
+        for (size_t j = i + 1; j < People; ++j)
         {
-            continue;
-        }
+            if (weights[i] == weights[j])
+            {
+                ++answer;
+                continue;
+            }
 
-        answer += arr[i] * (arr[i] - 1) / 2;
+            int HeavyPerson = weights[i] < weights[j] ? weights[j] : weights[i];
+            int LightPerson = weights[i] < weights[j] ? weights[i] : weights[j];
 
-        answer += arr[i] * arr[2 * i];
-
-        if ((i * 3) % 2 == 0)
-        {
-            answer += arr[i] * arr[i * 3 / 2];
-        }
-
-        if ((i * 4) % 3 == 0)
-        {
-            answer += arr[i] * arr[i * 4 / 3];
+            if (HeavyPerson * 2 == LightPerson * 3
+                || HeavyPerson * 2 == LightPerson * 4
+                || HeavyPerson * 3 == LightPerson * 4)
+            {
+                ++answer;
+            }
         }
     }
 
