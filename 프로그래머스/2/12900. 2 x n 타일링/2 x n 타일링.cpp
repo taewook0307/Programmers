@@ -14,13 +14,13 @@ int solution(int n)
     
     int n1 = 1;
     int n2 = 2;
-    int temp = -1;
     
     for(int i = 3; i <= n; ++i)
     {
-        temp = n2;
-        n2 = (n1 + n2) % 1000000007;
-        n1 = temp;
+        n1 += n2;
+        n1 %= 1000000007;
+        std::swap(n1, n2);
     }
+    
     return n2;
 }
