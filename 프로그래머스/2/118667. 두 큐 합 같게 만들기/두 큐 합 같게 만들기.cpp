@@ -1,8 +1,6 @@
 #include <vector>
 #include <queue>
 
-
-
 int solution(std::vector<int> queue1, std::vector<int> queue2)
 {
     int answer = 0;
