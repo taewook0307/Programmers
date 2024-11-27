@@ -1,6 +1,5 @@
 #include <vector>
 #include <set>
-#include <algorithm>
 
 std::vector<int> solution(std::vector<int> numbers)
 {
