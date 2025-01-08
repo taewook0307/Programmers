@@ -21,7 +21,7 @@ class Solution
         Pay[0, 0] = 1;
         IsVisited[0, 0] = true;
 
-        while (BFS.Count > 0)
+        while (true == BFS.Any())
         {
             var (curX, curY) = BFS.Dequeue();
 
