@@ -6,68 +6,47 @@ class Solution
 {
     public int solution(int[,] maps)
     {
-        int answer = 0;
-
         int Row = maps.GetLength(0);
         int Column = maps.GetLength(1);
 
         int[] DirX = { -1, 1, 0, 0 };
-        int[] DirY = { 0, 0, - 1, 1 };
+        int[] DirY = { 0, 0, -1, 1 };
 
-        List<List<int>> Pay = new List<List<int>>();
+        int[,] Pay = new int[Row, Column];
+        bool[,] IsVisited = new bool[Row, Column];
 
-        for (int i = 0; i < Row; i++)
+        Queue<(int, int)> BFS = new Queue<(int, int)>();
+
+        BFS.Enqueue((0, 0));
+        Pay[0, 0] = 1;
+        IsVisited[0, 0] = true;
+
+        while (BFS.Count > 0)
         {
-            Pay.Add(new List<int>(new int[Column]));
-        }
+            var (curX, curY) = BFS.Dequeue();
 
-        List<List<bool>> IsVisited = new List<List<bool>>();
-
-        for (int i = 0; i < Row; i++)
-        {
-            IsVisited.Add(new List<bool>(new bool[Column]));
-        }
-
-        Queue<KeyValuePair<int, int>> BFS = new Queue<KeyValuePair<int, int>>();
-
-        BFS.Enqueue(new KeyValuePair<int, int>(0, 0));
-        Pay[0][0] = 1;
-        IsVisited[0][0] = true;
-
-        while (true == BFS.Any())
-        {
-            KeyValuePair<int, int> CurNode = BFS.Dequeue();
-
-            for(int i = 0; i < 4; ++i)
+            if (curX == Row - 1 && curY == Column - 1)
             {
-                int NewX = CurNode.Key + DirX[i];
-                int NewY = CurNode.Value + DirY[i];
+                return Pay[curX, curY];
+            }
 
-                if(NewX < 0
-                   || NewY < 0
-                   || NewX == Row
-                   || NewY == Column
-                   || IsVisited[NewX][NewY] == true
-                   || maps[NewX, NewY] == 0)
+            for (int i = 0; i < 4; ++i)
+            {
+                int NewX = curX + DirX[i];
+                int NewY = curY + DirY[i];
+
+                if (NewX < 0 || NewY < 0 || NewX == Row || NewY == Column 
+                    || IsVisited[NewX, NewY] || maps[NewX, NewY] == 0)
                 {
                     continue;
                 }
 
-                IsVisited[NewX][NewY] = true;
-                Pay[NewX][NewY] = Pay[CurNode.Key][CurNode.Value] + 1;
-                BFS.Enqueue(new KeyValuePair<int, int>(NewX, NewY));
+                IsVisited[NewX, NewY] = true;
+                Pay[NewX, NewY] = Pay[curX, curY] + 1;
+                BFS.Enqueue((NewX, NewY));
             }
         }
 
-        if(true == IsVisited[Row - 1][Column - 1])
-        {
-            answer = Pay[Row - 1][Column - 1];
-        }
-        else
-        {
-            answer = -1;
-        }
-
-        return answer;
+        return -1;
     }
 }
